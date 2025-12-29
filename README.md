@@ -276,7 +276,7 @@ ISC
 
 ## 🤝 Contributing
 
-This project is feature-complete for the CLI version (v1.0.0). See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for the complete roadmap and contribution guidelines.
+This project is feature-complete for the CLI version (v1.0.0).
 
 **Status**: ✅ All core features (Phases 0-6) are complete. Phase 7 (Desktop GUI) is planned for future releases.
 
@@ -300,5 +300,4 @@ Examples: `3h`, `180m`, `2.5h`
 
 ## 📚 Additional Resources
 
-- [Implementation Plan](./IMPLEMENTATION_PLAN.md) - Detailed development roadmap
 - [API Documentation](./docs/API.md) - API reference
