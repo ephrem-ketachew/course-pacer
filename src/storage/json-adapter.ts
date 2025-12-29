@@ -65,6 +65,27 @@ export async function getCourse(courseId: string): Promise<Course | null> {
   }
   const courseObj = courseData as Record<string, unknown>;
   const config = CourseConfigSchema.parse(courseObj.config || {});
+  if (typeof courseObj.scannedAt === 'string') {
+    courseObj.scannedAt = new Date(courseObj.scannedAt);
+  }
+  if (Array.isArray(courseObj.videos)) {
+    courseObj.videos = courseObj.videos.map((video: unknown) => {
+      const v = video as Record<string, unknown>;
+      if (typeof v.lastModified === 'string') {
+        v.lastModified = new Date(v.lastModified);
+      }
+      return v;
+    });
+  }
+  if (courseObj.progress && typeof courseObj.progress === 'object') {
+    const progress = courseObj.progress as Record<string, unknown>;
+    for (const key in progress) {
+      const p = progress[key] as Record<string, unknown>;
+      if (p.watchedAt && typeof p.watchedAt === 'string') {
+        p.watchedAt = new Date(p.watchedAt);
+      }
+    }
+  }
   const courseWithProgress = { ...courseObj, progress: courseObj.progress || {}, config };
   const result = safeParse(CourseSchema, courseWithProgress);
   if (!result.success) {
@@ -88,6 +109,27 @@ export async function getCourseByPath(rootPath: string): Promise<Course | null> 
           folderMultipliers: {},
         }
       );
+      if (typeof courseObj.scannedAt === 'string') {
+        courseObj.scannedAt = new Date(courseObj.scannedAt);
+      }
+      if (Array.isArray(courseObj.videos)) {
+        courseObj.videos = courseObj.videos.map((video: unknown) => {
+          const v = video as Record<string, unknown>;
+          if (typeof v.lastModified === 'string') {
+            v.lastModified = new Date(v.lastModified);
+          }
+          return v;
+        });
+      }
+      if (courseObj.progress && typeof courseObj.progress === 'object') {
+        const progress = courseObj.progress as Record<string, unknown>;
+        for (const key in progress) {
+          const p = progress[key] as Record<string, unknown>;
+          if (p.watchedAt && typeof p.watchedAt === 'string') {
+            p.watchedAt = new Date(p.watchedAt);
+          }
+        }
+      }
       const courseWithProgress = { ...courseObj, progress: courseObj.progress || {}, config };
       const result = safeParse(CourseSchema, courseWithProgress);
       if (result.success) {
@@ -109,6 +151,27 @@ export async function listCourses(): Promise<Course[]> {
         folderMultipliers: {},
       }
     );
+    if (typeof courseObj.scannedAt === 'string') {
+      courseObj.scannedAt = new Date(courseObj.scannedAt);
+    }
+    if (Array.isArray(courseObj.videos)) {
+      courseObj.videos = courseObj.videos.map((video: unknown) => {
+        const v = video as Record<string, unknown>;
+        if (typeof v.lastModified === 'string') {
+          v.lastModified = new Date(v.lastModified);
+        }
+        return v;
+      });
+    }
+    if (courseObj.progress && typeof courseObj.progress === 'object') {
+      const progress = courseObj.progress as Record<string, unknown>;
+      for (const key in progress) {
+        const p = progress[key] as Record<string, unknown>;
+        if (p.watchedAt && typeof p.watchedAt === 'string') {
+          p.watchedAt = new Date(p.watchedAt);
+        }
+      }
+    }
     const courseWithProgress = { ...courseObj, progress: courseObj.progress || {}, config };
     const result = safeParse(CourseSchema, courseWithProgress);
     if (result.success) {

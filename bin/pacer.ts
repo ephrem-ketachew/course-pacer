@@ -18,8 +18,12 @@ import { executeDeadline } from '../src/cli/commands/deadline.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const packageJsonPath = join(__dirname, '..', '..', 'package.json');
-const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+const packageJsonPath = __dirname.includes('dist')
+  ? join(__dirname, '..', '..', 'package.json')
+  : join(__dirname, '..', 'package.json');
+const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as {
+  version: string;
+};
 
 const program = new Command();
 
@@ -53,13 +57,23 @@ program
   .description('Generate a study session plan')
   .argument('<time>', 'Time budget (e.g., 3h, 180m)')
   .argument('[course-path]', 'Course path (optional, uses first course if omitted)')
-  .option('--from <checkpoint>', 'Start from checkpoint (last, beginning, checkpoint, or video-id)', 'last')
+  .option(
+    '--from <checkpoint>',
+    'Start from checkpoint (last, beginning, checkpoint, or video-id)',
+    'last'
+  )
   .option('--section <section>', 'Limit to specific section')
   .option('--no-practice', 'Exclude practice time from budget')
   .option('--json', 'Output as JSON')
-  .action(async (time: string, coursePath: string | undefined, options: { from?: string; section?: string; noPractice?: boolean; json?: boolean }) => {
-    await executePlan(time, coursePath, options);
-  });
+  .action(
+    async (
+      time: string,
+      coursePath: string | undefined,
+      options: { from?: string; section?: string; noPractice?: boolean; json?: boolean }
+    ) => {
+      await executePlan(time, coursePath, options);
+    }
+  );
 
 program
   .command('mark')
@@ -70,21 +84,45 @@ program
   .option('-a, --all', 'Mark all videos in course')
   .option('-s, --section <section>', 'Mark all videos in section')
   .option('-n, --notes <notes>', 'Add notes to video')
-  .action(async (videoId: string, options: { watched?: boolean; unwatched?: boolean; all?: boolean; section?: string; notes?: string }) => {
-    const status = options.watched ? 'watched' : options.unwatched ? 'unwatched' : undefined;
-    await executeMark(videoId, { status, all: options.all, section: options.section, notes: options.notes });
-  });
+  .action(
+    async (
+      videoId: string,
+      options: {
+        watched?: boolean;
+        unwatched?: boolean;
+        all?: boolean;
+        section?: string;
+        notes?: string;
+      }
+    ) => {
+      const status = options.watched ? 'watched' : options.unwatched ? 'unwatched' : undefined;
+      await executeMark(videoId, {
+        status,
+        all: options.all,
+        section: options.section,
+        notes: options.notes,
+      });
+    }
+  );
 
 program
   .command('config')
   .description('Interactive configuration menu')
   .argument('[course-path]', 'Course path (optional, configures first course if omitted)')
   .option('--speed <speed>', 'Set playback speed (e.g., 1.5)')
-  .option('--multiplier <folder:value>', 'Set practice multiplier for folder (format: folder:value)')
+  .option(
+    '--multiplier <folder:value>',
+    'Set practice multiplier for folder (format: folder:value)'
+  )
   .option('--reset', 'Reset to defaults')
-  .action(async (coursePath: string | undefined, options: { speed?: string; multiplier?: string; reset?: boolean }) => {
-    await executeConfig(coursePath, options);
-  });
+  .action(
+    async (
+      coursePath: string | undefined,
+      options: { speed?: string; multiplier?: string; reset?: boolean }
+    ) => {
+      await executeConfig(coursePath, options);
+    }
+  );
 
 program
   .command('analyze')
@@ -97,9 +135,22 @@ program
   .option('--json', 'Output as JSON')
   .option('--csv', 'Output as CSV')
   .option('-o, --output <file>', 'Save report to file')
-  .action(async (coursePath: string | undefined, options: { section?: string; watched?: boolean; unwatched?: boolean; format?: string; json?: boolean; csv?: boolean; output?: string }) => {
-    await executeAnalyze(coursePath, options);
-  });
+  .action(
+    async (
+      coursePath: string | undefined,
+      options: {
+        section?: string;
+        watched?: boolean;
+        unwatched?: boolean;
+        format?: string;
+        json?: boolean;
+        csv?: boolean;
+        output?: string;
+      }
+    ) => {
+      await executeAnalyze(coursePath, options);
+    }
+  );
 
 program
   .command('launch')
@@ -130,9 +181,15 @@ program
   .option('--time <time>', 'Time budget for plan (e.g., 3h)')
   .option('--date <date>', 'Start date (YYYY-MM-DD)')
   .option('-o, --output <file>', 'Output file path')
-  .action(async (type: string, coursePath: string | undefined, options: { time?: string; date?: string; output?: string }) => {
-    await executeExport(type as 'calendar', coursePath, options);
-  });
+  .action(
+    async (
+      type: string,
+      coursePath: string | undefined,
+      options: { time?: string; date?: string; output?: string }
+    ) => {
+      await executeExport(type as 'calendar', coursePath, options);
+    }
+  );
 
 program
   .command('deadline')
@@ -141,10 +198,18 @@ program
   .option('--deadline <date>', 'Target deadline (YYYY-MM-DD)')
   .option('--suggest', 'Suggest optimal deadline')
   .option('--hours-per-day <hours>', 'Hours per day for suggestion', '2')
-  .action(async (coursePath: string | undefined, options: { deadline?: string; suggest?: boolean; hoursPerDay?: string }) => {
-    const hoursPerDay = options.hoursPerDay ? parseFloat(options.hoursPerDay) : undefined;
-    await executeDeadline(coursePath, { deadline: options.deadline, suggest: options.suggest, hoursPerDay });
-  });
+  .action(
+    async (
+      coursePath: string | undefined,
+      options: { deadline?: string; suggest?: boolean; hoursPerDay?: string }
+    ) => {
+      const hoursPerDay = options.hoursPerDay ? parseFloat(options.hoursPerDay) : undefined;
+      await executeDeadline(coursePath, {
+        deadline: options.deadline,
+        suggest: options.suggest,
+        hoursPerDay,
+      });
+    }
+  );
 
 program.parse();
-
