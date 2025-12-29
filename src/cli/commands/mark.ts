@@ -35,9 +35,7 @@ export async function executeMark(
     if (!course) {
       throw new CourseNotFoundError(videoIdOrPath);
     }
-    const video = course.videos.find(
-      (v) => v.id === videoIdOrPath || v.filename === videoIdOrPath
-    );
+    const video = course.videos.find(v => v.id === videoIdOrPath || v.filename === videoIdOrPath);
     if (!video) {
       throw new VideoNotFoundError(videoIdOrPath);
     }
@@ -48,14 +46,10 @@ export async function executeMark(
     if (options.status === 'watched') {
       await markVideoWatched(course.id, video.id, options.notes);
       await updateStreak();
-      console.log(
-        chalk.green(`✓ Marked "${video.filename}" as watched`)
-      );
+      console.log(chalk.green(`✓ Marked "${video.filename}" as watched`));
     } else if (options.status === 'unwatched') {
       await markVideoUnwatched(course.id, video.id);
-      console.log(
-        chalk.yellow(`○ Marked "${video.filename}" as unwatched`)
-      );
+      console.log(chalk.yellow(`○ Marked "${video.filename}" as unwatched`));
     } else {
       const isWatched = await toggleVideoWatched(course.id, video.id);
       if (isWatched) {
@@ -83,7 +77,7 @@ async function handleSectionMarking(
     console.error(chalk.red(`Course not found: ${coursePath}`));
     process.exit(1);
   }
-  const sections = new Set(course.videos.map((v) => v.section).filter(Boolean));
+  const sections = new Set(course.videos.map(v => v.section).filter(Boolean));
   if (!sections.has(section)) {
     console.error(chalk.red(`Section not found: ${section}`));
     console.log(chalk.gray(`Available sections: ${Array.from(sections).join(', ')}`));
@@ -94,9 +88,7 @@ async function handleSectionMarking(
     await updateStreak();
   }
   const action = status === 'watched' ? 'watched' : 'unwatched';
-  console.log(
-    chalk.green(`✓ Marked ${count} videos in "${section}" as ${action}`)
-  );
+  console.log(chalk.green(`✓ Marked ${count} videos in "${section}" as ${action}`));
 }
 async function handleBulkMarking(
   coursePath: string,
@@ -107,7 +99,7 @@ async function handleBulkMarking(
     console.error(chalk.red(`Course not found: ${coursePath}`));
     process.exit(1);
   }
-  const { confirm } = await inquirer.prompt([
+  const { confirm } = await inquirer.prompt<{ confirm: boolean }>([
     {
       type: 'confirm',
       name: 'confirm',
@@ -131,21 +123,19 @@ async function handleBulkMarking(
   if (status === 'watched' && count > 0) {
     await updateStreak();
   }
-  console.log(
-    chalk.green(`✓ Marked ${count} videos as ${status}`)
-  );
+  console.log(chalk.green(`✓ Marked ${count} videos as ${status}`));
 }
 async function handleUpToMarking(
   courseId: string,
   targetVideoId: string,
   status: 'watched' | 'unwatched'
 ): Promise<void> {
-  const count = await markVideosUpTo(courseId, targetVideoId, status === 'watched');
+  const count = await (
+    markVideosUpTo as (courseId: string, targetVideoId: string, watched: boolean) => Promise<number>
+  )(courseId, targetVideoId, status === 'watched');
   if (status === 'watched' && count > 0) {
     await updateStreak();
   }
   const action = status === 'watched' ? 'watched' : 'unwatched';
-  console.log(
-    chalk.green(`✓ Marked ${count} videos up to target as ${action}`)
-  );
+  console.log(chalk.green(`✓ Marked ${count} videos up to target as ${action}`));
 }
