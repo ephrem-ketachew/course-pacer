@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { VideoFileSchema, VideoProgressSchema } from './video.js';
 export const CourseConfigSchema = z.object({
-  playbackSpeed: z.number().min(0.5).max(3.0).default(1.0),
-  defaultPracticeMultiplier: z.number().min(0).max(10).default(1.0),
-  folderMultipliers: z.record(z.string(), z.number()).default({}),
+  playbackSpeed: z.number().min(0.5).max(3.0),
+  defaultPracticeMultiplier: z.number().min(0).max(10),
+  folderMultipliers: z.record(z.string(), z.number()),
 });
 export type CourseConfig = z.infer<typeof CourseConfigSchema>;
 export const CourseSchema = z.object({
@@ -11,7 +11,7 @@ export const CourseSchema = z.object({
   rootPath: z.string(),
   scannedAt: z.date(),
   videos: z.array(VideoFileSchema),
-  progress: z.record(z.string(), VideoProgressSchema).default({}),
+  progress: z.record(z.string(), VideoProgressSchema),
   config: CourseConfigSchema,
   checkpoint: z.string().optional(),
 });

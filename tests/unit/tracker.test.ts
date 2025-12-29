@@ -17,7 +17,7 @@ describe('Progress Tracker', () => {
         path: '/test/course/video1.mp4',
         relativePath: 'video1.mp4',
         filename: 'video1.mp4',
-        duration: 3600, // 1 hour
+        duration: 3600,
         size: 1000000,
         format: 'mp4',
         lastModified: new Date(),
@@ -28,7 +28,7 @@ describe('Progress Tracker', () => {
         path: '/test/course/video2.mp4',
         relativePath: 'video2.mp4',
         filename: 'video2.mp4',
-        duration: 1800, // 30 minutes
+        duration: 1800,
         size: 500000,
         format: 'mp4',
         lastModified: new Date(),
@@ -40,7 +40,7 @@ describe('Progress Tracker', () => {
         path: '/test/course/video3.mp4',
         relativePath: 'video3.mp4',
         filename: 'video3.mp4',
-        duration: 2700, // 45 minutes
+        duration: 2700,
         size: 750000,
         format: 'mp4',
         lastModified: new Date(),
@@ -69,16 +69,16 @@ describe('Progress Tracker', () => {
   describe('calculateCourseProgress', () => {
     it('should calculate correct completion percentage', () => {
       const progress = calculateCourseProgress(mockCourse);
-      expect(progress.completionPercentage).toBe(33); // 1 out of 3 videos
+      expect(progress.completionPercentage).toBe(33);
       expect(progress.watchedVideos).toBe(1);
       expect(progress.totalVideos).toBe(3);
     });
 
     it('should calculate correct durations', () => {
       const progress = calculateCourseProgress(mockCourse);
-      expect(progress.totalDuration).toBe(8100); // 3600 + 1800 + 2700
-      expect(progress.watchedDuration).toBe(3600); // Only video-1 watched
-      expect(progress.remainingDuration).toBe(4500); // 8100 - 3600
+      expect(progress.totalDuration).toBe(8100);
+      expect(progress.watchedDuration).toBe(3600);
+      expect(progress.remainingDuration).toBe(4500);
     });
 
     it('should calculate section-level progress', () => {
@@ -90,8 +90,7 @@ describe('Progress Tracker', () => {
 
     it('should adjust durations for playback speed', () => {
       const progress = calculateCourseProgress(mockCourse, 2.0);
-      // With 2x speed, durations should be halved
-      expect(progress.totalDuration).toBe(4050); // 8100 / 2
+      expect(progress.totalDuration).toBe(4050);
     });
   });
 

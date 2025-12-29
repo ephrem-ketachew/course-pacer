@@ -49,11 +49,12 @@ export function generateSessionPlan(
     playlist.map((cv) => cv.video),
     course.config
   );
+  const includePractice = options.includePractice !== false;
   return {
     videos: playlist.map((cv) => cv.video),
     totalVideoTime: totals.totalVideoTime,
-    totalPracticeTime: totals.totalPracticeTime,
-    totalTime: totals.totalTime,
+    totalPracticeTime: includePractice ? totals.totalPracticeTime : 0,
+    totalTime: includePractice ? totals.totalTime : totals.totalVideoTime,
     startCheckpoint: startVideo.id,
     endCheckpoint: playlist[playlist.length - 1]?.video.id ?? startVideo.id,
   };

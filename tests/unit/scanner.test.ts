@@ -18,7 +18,6 @@ describe('Scanner Utilities', () => {
 
   describe('FFprobe availability', () => {
     it('should detect FFprobe availability', () => {
-      // This should be true if dependencies are installed
       const available = isFFprobeAvailable();
       expect(typeof available).toBe('boolean');
     });

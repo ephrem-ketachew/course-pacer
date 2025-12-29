@@ -40,7 +40,6 @@ describe('Integration: Mark Command', () => {
       const course = await getCourseByPath(mockCourse.rootPath);
       expect(course?.progress['video-1']?.watched).toBe(true);
     } catch (error) {
-      // Expected in test environment if course path doesn't exist
       expect(error).toBeDefined();
     }
   });

@@ -5,7 +5,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { appDataDir } from './paths.js';
 import type { Database } from '../models/config.js';
 import type { Course } from '../models/course.js';
-import { CourseSchema } from '../models/course.js';
+import { CourseSchema, CourseConfigSchema } from '../models/course.js';
 import { safeParse } from '../utils/validators.js';
 const DB_FILE = 'database.json';
 const DB_VERSION = '1.0';
@@ -54,7 +54,7 @@ export async function getDatabase(): Promise<Low<Database>> {
 }
 export async function saveCourse(course: Course): Promise<void> {
   const db = await getDatabase();
-  db.data.courses[course.id] = { ...course, progress: course.progress || {} };
+  db.data.courses[course.id] = { ...course, progress: course.progress };
   await db.write();
 }
 export async function getCourse(courseId: string): Promise<Course | null> {
@@ -63,7 +63,8 @@ export async function getCourse(courseId: string): Promise<Course | null> {
   if (!courseData) {
     return null;
   }
-  const courseWithProgress = { ...courseData, progress: courseData.progress || {} };
+  const config = CourseConfigSchema.parse(courseData.config || {});
+  const courseWithProgress = { ...courseData, progress: courseData.progress || {}, config };
   const result = safeParse(CourseSchema, courseWithProgress);
   if (!result.success) {
     throw new Error(`Invalid course data: ${result.error}`);
@@ -76,7 +77,12 @@ export async function getCourseByPath(rootPath: string): Promise<Course | null> 
   for (const course of Object.values(db.data.courses)) {
     const coursePath = course.rootPath.replace(/\\/g, '/').toLowerCase();
     if (coursePath === normalizedPath) {
-      const courseWithProgress = { ...course, progress: course.progress || {} };
+      const config = CourseConfigSchema.parse(course.config || {
+        playbackSpeed: 1.0,
+        defaultPracticeMultiplier: 1.0,
+        folderMultipliers: {},
+      });
+      const courseWithProgress = { ...course, progress: course.progress || {}, config };
       const result = safeParse(CourseSchema, courseWithProgress);
       if (result.success) {
         return result.data;
@@ -89,7 +95,12 @@ export async function listCourses(): Promise<Course[]> {
   const db = await getDatabase();
   const courses: Course[] = [];
   for (const courseData of Object.values(db.data.courses)) {
-    const courseWithProgress = { ...courseData, progress: courseData.progress || {} };
+    const config = CourseConfigSchema.parse(courseData.config || {
+      playbackSpeed: 1.0,
+      defaultPracticeMultiplier: 1.0,
+      folderMultipliers: {},
+    });
+    const courseWithProgress = { ...courseData, progress: courseData.progress || {}, config };
     const result = safeParse(CourseSchema, courseWithProgress);
     if (result.success) {
       courses.push(result.data);

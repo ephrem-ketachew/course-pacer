@@ -17,7 +17,7 @@ describe('Integration: Plan Command', () => {
           path: '/test/course/video1.mp4',
           relativePath: 'video1.mp4',
           filename: 'video1.mp4',
-          duration: 3600, // 1 hour
+          duration: 3600,
           size: 1000000,
           format: 'mp4',
           lastModified: new Date(),
@@ -28,7 +28,7 @@ describe('Integration: Plan Command', () => {
           path: '/test/course/video2.mp4',
           relativePath: 'video2.mp4',
           filename: 'video2.mp4',
-          duration: 1800, // 30 minutes
+          duration: 1800,
           size: 500000,
           format: 'mp4',
           lastModified: new Date(),
@@ -45,21 +45,16 @@ describe('Integration: Plan Command', () => {
   });
 
   it('should generate plan for valid time budget', async () => {
-    // Save course first
     await saveCourse(mockCourse);
 
-    // Test plan generation
     try {
       await executePlan('2h', mockCourse.rootPath, {
         from: 'beginning',
         noPractice: true,
         json: true,
       });
-      // If we get here, the command executed successfully
       expect(true).toBe(true);
     } catch (error) {
-      // If course not found, that's expected in test environment
-      // The important thing is that the command structure is correct
       expect(error).toBeDefined();
     }
   });

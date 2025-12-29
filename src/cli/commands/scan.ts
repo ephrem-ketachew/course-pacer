@@ -16,12 +16,17 @@ import { updateStreak } from '../../core/gamification/streak-tracker.js';
 function generateCourseId(rootPath: string): string {
   return createHash('sha256').update(rootPath).digest('hex').substring(0, 16);
 }
+import { existsSync } from 'fs';
+
 export async function executeScan(
   path: string,
   options: { force?: boolean; quiet?: boolean }
 ): Promise<void> {
   const spinner = ora('Scanning directory...').start();
   try {
+    if (!existsSync(path)) {
+      throw new Error(`Directory does not exist: ${path}`);
+    }
     const existingCourse = await getCourseByPath(path);
     if (existingCourse && !options.force) {
       spinner.info(
@@ -58,7 +63,11 @@ export async function executeScan(
       scannedAt: new Date(),
       videos: scanResult.videos,
       progress: existingCourse?.progress ?? {},
-      config: existingCourse?.config ?? CourseConfigSchema.parse({}),
+      config: existingCourse?.config ?? CourseConfigSchema.parse({
+        playbackSpeed: 1.0,
+        defaultPracticeMultiplier: 1.0,
+        folderMultipliers: {},
+      }),
       checkpoint: existingCourse?.checkpoint,
     };
     spinner.start(chalk.gray('Saving to database...'));

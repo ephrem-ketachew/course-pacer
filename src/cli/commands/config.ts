@@ -82,7 +82,7 @@ export async function executeConfig(
 }
 async function showInteractiveMenu(): Promise<void> {
   const courses = await listCourses();
-  await getGlobalConfig(); // Initialize global config
+  await getGlobalConfig();
   console.log('\n' + chalk.bold('⚙️  Configuration'));
   console.log('═'.repeat(60));
   const { action } = await inquirer.prompt([
@@ -255,13 +255,13 @@ async function configureSectionMultipliers(course: {
     console.log(chalk.yellow('No sections found in this course'));
     return;
   }
+  const globalConfig = await getGlobalConfig();
   const { section } = await inquirer.prompt([
     {
       type: 'list',
       name: 'section',
       message: 'Select section to configure:',
       choices: sections.map((s) => {
-        const globalConfig = await getGlobalConfig();
         return {
           name: `${s} (current: ${course.config.folderMultipliers[s ?? ''] ?? globalConfig.defaultPracticeMultiplier}x)`,
           value: s,
@@ -272,7 +272,6 @@ async function configureSectionMultipliers(course: {
   if (!section) {
     throw new Error('No section selected');
   }
-  const globalConfig = await getGlobalConfig();
   const currentMultiplier =
     course.config.folderMultipliers[section] ??
     globalConfig.defaultPracticeMultiplier;

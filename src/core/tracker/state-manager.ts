@@ -4,7 +4,7 @@ import {
   saveCourse,
   getCourseByPath,
 } from '../../storage/database.js';
-import { CourseSchema } from '../../models/course.js';
+import { CourseSchema, CourseConfigSchema } from '../../models/course.js';
 import { safeParse } from '../../utils/validators.js';
 export async function markVideoWatched(
   courseId: string,
@@ -29,7 +29,8 @@ export async function markVideoWatched(
     notes,
   };
   course.checkpoint = videoId;
-  const result = safeParse(CourseSchema, { ...course, progress: course.progress || {} });
+  const config = CourseConfigSchema.parse(course.config);
+  const result = safeParse(CourseSchema, { ...course, progress: course.progress, config });
   if (!result.success) {
     throw new Error(`Invalid course data: ${result.error}`);
   }
@@ -53,7 +54,8 @@ export async function markVideoUnwatched(
       watchedAt: undefined,
     };
   }
-  const result = safeParse(CourseSchema, { ...course, progress: course.progress || {} });
+  const config = CourseConfigSchema.parse(course.config);
+  const result = safeParse(CourseSchema, { ...course, progress: course.progress, config });
   if (!result.success) {
     throw new Error(`Invalid course data: ${result.error}`);
   }
@@ -101,7 +103,8 @@ export async function updateVideoNotes(
     ...course.progress[videoId],
     notes,
   };
-  const result = safeParse(CourseSchema, { ...course, progress: course.progress || {} });
+  const config = CourseConfigSchema.parse(course.config);
+  const result = safeParse(CourseSchema, { ...course, progress: course.progress, config });
   if (!result.success) {
     throw new Error(`Invalid course data: ${result.error}`);
   }
@@ -144,11 +147,15 @@ export async function updateCourseConfig(
   if (!course) {
     throw new Error(`Course not found: ${courseId}`);
   }
-  course.config = {
+  const updatedConfig = {
     ...course.config,
     ...config,
   };
-  const result = safeParse(CourseSchema, { ...course, progress: course.progress || {} });
+  const parsedConfig = CourseConfigSchema.parse(updatedConfig);
+  if (!course.progress) {
+    course.progress = {};
+  }
+  const result = safeParse(CourseSchema, { ...course, progress: course.progress, config: parsedConfig });
   if (!result.success) {
     throw new Error(`Invalid course data: ${result.error}`);
   }
@@ -167,7 +174,11 @@ export async function setCheckpoint(
     throw new Error(`Video not found: ${videoId}`);
   }
   course.checkpoint = videoId;
-  const result = safeParse(CourseSchema, { ...course, progress: course.progress || {} });
+  if (!course.progress) {
+    course.progress = {};
+  }
+  const config = CourseConfigSchema.parse(course.config);
+  const result = safeParse(CourseSchema, { ...course, progress: course.progress, config });
   if (!result.success) {
     throw new Error(`Invalid course data: ${result.error}`);
   }
