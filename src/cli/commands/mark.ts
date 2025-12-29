@@ -4,6 +4,7 @@ import {
   toggleVideoWatched,
   updateVideoNotes,
   markSectionVideos,
+  markVideosUpTo,
   findCourseByVideo,
 } from '../../core/tracker/state-manager.js';
 import { getCourseByPath } from '../../storage/database.js';
@@ -17,6 +18,7 @@ export async function executeMark(
     status?: 'watched' | 'unwatched';
     all?: boolean;
     section?: string;
+    upTo?: boolean;
     notes?: string;
   }
 ): Promise<void> {
@@ -38,6 +40,10 @@ export async function executeMark(
     );
     if (!video) {
       throw new VideoNotFoundError(videoIdOrPath);
+    }
+    if (options.upTo) {
+      await handleUpToMarking(course.id, video.id, options.status ?? 'watched');
+      return;
     }
     if (options.status === 'watched') {
       await markVideoWatched(course.id, video.id, options.notes);
@@ -127,5 +133,19 @@ async function handleBulkMarking(
   }
   console.log(
     chalk.green(`✓ Marked ${count} videos as ${status}`)
+  );
+}
+async function handleUpToMarking(
+  courseId: string,
+  targetVideoId: string,
+  status: 'watched' | 'unwatched'
+): Promise<void> {
+  const count = await markVideosUpTo(courseId, targetVideoId, status === 'watched');
+  if (status === 'watched' && count > 0) {
+    await updateStreak();
+  }
+  const action = status === 'watched' ? 'watched' : 'unwatched';
+  console.log(
+    chalk.green(`✓ Marked ${count} videos up to target as ${action}`)
   );
 }

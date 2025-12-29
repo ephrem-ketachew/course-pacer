@@ -139,6 +139,40 @@ export async function markSectionVideos(
   }
   return count;
 }
+export async function markVideosUpTo(
+  courseId: string,
+  targetVideoId: string,
+  watched: boolean
+): Promise<number> {
+  const course = await getCourse(courseId);
+  if (!course) {
+    throw new Error(`Course not found: ${courseId}`);
+  }
+  const targetVideo = course.videos.find((v) => v.id === targetVideoId);
+  if (!targetVideo) {
+    throw new Error(`Video not found: ${targetVideoId}`);
+  }
+  const targetIndex = course.videos.findIndex((v) => v.id === targetVideoId);
+  if (targetIndex === -1) {
+    throw new Error(`Video not found in course: ${targetVideoId}`);
+  }
+  const videosToMark = course.videos.slice(0, targetIndex + 1);
+  let count = 0;
+  for (const video of videosToMark) {
+    if (watched) {
+      if (!course.progress[video.id]?.watched) {
+        await markVideoWatched(courseId, video.id);
+        count++;
+      }
+    } else {
+      if (course.progress[video.id]?.watched) {
+        await markVideoUnwatched(courseId, video.id);
+        count++;
+      }
+    }
+  }
+  return count;
+}
 export async function updateCourseConfig(
   courseId: string,
   config: Partial<CourseConfig>

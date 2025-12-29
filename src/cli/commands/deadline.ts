@@ -81,8 +81,9 @@ function displayDeadlineCalculation(calc: {
   console.log(
     `Hours remaining: ${chalk.yellow(calc.hoursRemaining.toFixed(1))} hours`
   );
+  const requiredColor = calc.isAchievable ? chalk.green : chalk.red;
   console.log(
-    `Required: ${calc.isAchievable ? chalk.green : chalk.red}(${calc.hoursPerDay.toFixed(1)} hours/day)`
+    `Required: ${requiredColor(calc.hoursPerDay.toFixed(1) + ' hours/day')}`
   );
   console.log(`\n${chalk.bold('Recommendation:')} ${calc.recommendation}`);
   if (!calc.isAchievable) {

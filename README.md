@@ -28,6 +28,8 @@ npm run build
 
 ## 📖 Usage
 
+> **💡 Quick Start:** Check out the [Cheat Sheet](./CHEAT_SHEET.md) for a quick reference of the most common commands!
+
 ### Scanning Courses
 
 Scan a directory to discover and catalog video files:
@@ -96,11 +98,17 @@ pacer mark "video.mp4" --watched
 # Mark as unwatched
 pacer mark "video.mp4" --unwatched
 
+# Mark all videos up to a specific video (useful after watching multiple videos)
+pacer mark "video.mp4" --watched --up-to
+
 # Toggle watched status (default)
 pacer mark "video.mp4"
 
 # Mark all videos in a section
 pacer mark "C:\Courses\React" --section "Section 06" --watched
+
+# Mark all videos in course
+pacer mark "C:\Courses\React" --all --watched
 
 # Add notes to a video
 pacer mark "video.mp4" --watched --notes "Great introduction!"
@@ -203,6 +211,7 @@ Mark a video as watched or unwatched.
 - `-u, --unwatched`: Mark as unwatched
 - `-a, --all`: Mark all videos in course
 - `-s, --section <section>`: Mark all videos in section
+- `--up-to`: Mark all videos up to and including this video
 - `-n, --notes <notes>`: Add notes to video
 
 ### `pacer config [course-path]`
@@ -300,4 +309,6 @@ Examples: `3h`, `180m`, `2.5h`
 
 ## 📚 Additional Resources
 
+- [User Manual](./USER_MANUAL.md) - Comprehensive guide with examples
+- [Cheat Sheet](./CHEAT_SHEET.md) - Quick reference for daily commands
 - [API Documentation](./docs/API.md) - API reference

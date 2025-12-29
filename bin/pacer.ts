@@ -83,6 +83,7 @@ program
   .option('-u, --unwatched', 'Mark as unwatched')
   .option('-a, --all', 'Mark all videos in course')
   .option('-s, --section <section>', 'Mark all videos in section')
+  .option('--up-to', 'Mark all videos up to and including this video')
   .option('-n, --notes <notes>', 'Add notes to video')
   .action(
     async (
@@ -92,6 +93,7 @@ program
         unwatched?: boolean;
         all?: boolean;
         section?: string;
+        upTo?: boolean;
         notes?: string;
       }
     ) => {
@@ -100,6 +102,7 @@ program
         status,
         all: options.all,
         section: options.section,
+        upTo: options.upTo,
         notes: options.notes,
       });
     }

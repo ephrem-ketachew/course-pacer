@@ -658,5 +658,11 @@ pacer deadline --suggest
 
 ---
 
+## Quick Reference
+
+For a quick command reference, see the [Cheat Sheet](./CHEAT_SHEET.md) - a condensed guide with the most frequently used commands ordered by usage frequency.
+
+---
+
 For more information, see the [README.md](./README.md) file.
 
