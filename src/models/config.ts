@@ -9,7 +9,7 @@ export const UserConfigSchema = z.object({
 export type UserConfig = z.infer<typeof UserConfigSchema>;
 export const DatabaseSchema = z.object({
   version: z.string(),
-  courses: z.record(z.string(), z.any()),
+  courses: z.record(z.string(), z.unknown()),
   globalConfig: UserConfigSchema,
   analytics: z
     .object({

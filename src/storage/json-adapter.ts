@@ -63,8 +63,9 @@ export async function getCourse(courseId: string): Promise<Course | null> {
   if (!courseData) {
     return null;
   }
-  const config = CourseConfigSchema.parse(courseData.config || {});
-  const courseWithProgress = { ...courseData, progress: courseData.progress || {}, config };
+  const courseObj = courseData as Record<string, unknown>;
+  const config = CourseConfigSchema.parse(courseObj.config || {});
+  const courseWithProgress = { ...courseObj, progress: courseObj.progress || {}, config };
   const result = safeParse(CourseSchema, courseWithProgress);
   if (!result.success) {
     throw new Error(`Invalid course data: ${result.error}`);
@@ -75,14 +76,19 @@ export async function getCourseByPath(rootPath: string): Promise<Course | null> 
   const db = await getDatabase();
   const normalizedPath = rootPath.replace(/\\/g, '/').toLowerCase();
   for (const course of Object.values(db.data.courses)) {
-    const coursePath = course.rootPath.replace(/\\/g, '/').toLowerCase();
+    const courseObj = course as Record<string, unknown>;
+    const coursePath = String(courseObj.rootPath || '')
+      .replace(/\\/g, '/')
+      .toLowerCase();
     if (coursePath === normalizedPath) {
-      const config = CourseConfigSchema.parse(course.config || {
-        playbackSpeed: 1.0,
-        defaultPracticeMultiplier: 1.0,
-        folderMultipliers: {},
-      });
-      const courseWithProgress = { ...course, progress: course.progress || {}, config };
+      const config = CourseConfigSchema.parse(
+        courseObj.config || {
+          playbackSpeed: 1.0,
+          defaultPracticeMultiplier: 1.0,
+          folderMultipliers: {},
+        }
+      );
+      const courseWithProgress = { ...courseObj, progress: courseObj.progress || {}, config };
       const result = safeParse(CourseSchema, courseWithProgress);
       if (result.success) {
         return result.data;
@@ -95,12 +101,15 @@ export async function listCourses(): Promise<Course[]> {
   const db = await getDatabase();
   const courses: Course[] = [];
   for (const courseData of Object.values(db.data.courses)) {
-    const config = CourseConfigSchema.parse(courseData.config || {
-      playbackSpeed: 1.0,
-      defaultPracticeMultiplier: 1.0,
-      folderMultipliers: {},
-    });
-    const courseWithProgress = { ...courseData, progress: courseData.progress || {}, config };
+    const courseObj = courseData as Record<string, unknown>;
+    const config = CourseConfigSchema.parse(
+      courseObj.config || {
+        playbackSpeed: 1.0,
+        defaultPracticeMultiplier: 1.0,
+        folderMultipliers: {},
+      }
+    );
+    const courseWithProgress = { ...courseObj, progress: courseObj.progress || {}, config };
     const result = safeParse(CourseSchema, courseWithProgress);
     if (result.success) {
       courses.push(result.data);
